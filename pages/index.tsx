@@ -1,31 +1,34 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Web3 from 'web3'
 import Web3Modal from 'web3modal'
-
-const initWeb3 = async (
-  setWeb3: Dispatch<SetStateAction<Web3>>
-): Promise<void> => {
-  if (typeof window !== 'undefined') {
-    const web3Modal = new Web3Modal({
-      network: 'mainnet', // optional
-      cacheProvider: true,
-      providerOptions: {}, // required
-    })
-    const provider = await web3Modal.connect()
-    setWeb3(new Web3(provider))
-  }
-}
+import { attemptPurchase, initWeb3 } from '../lib/web3'
 
 export const Home = (): JSX.Element => {
-  const [web3, setWeb3] = useState<Web3 | undefined>(undefined)
+  const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined)
+  const [web3Provider, setWeb3Provider] = useState<Web3 | undefined>(undefined)
 
   useEffect(() => {
-    if (!web3) {
-      initWeb3(setWeb3)
+    if (!web3Provider) {
+      initWeb3(setWeb3Provider, setWeb3Modal)
     }
   }, [])
 
-  return <h1>Using Web3 Version: {web3?.version}</h1>
+  if (!web3Provider) return <h1> loading </h1>
+
+  return (
+    <main>
+      <h1 className="title">Web3Modal Example</h1>
+      {web3Modal && (
+        <button
+          className="button"
+          type="button"
+          onClick={async () => await attemptPurchase(web3Modal, web3Provider)}
+        >
+          Send Funds
+        </button>
+      )}
+    </main>
+  )
 }
 
 export default Home
