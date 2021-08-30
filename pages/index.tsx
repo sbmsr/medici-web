@@ -4,11 +4,11 @@ import { initWeb3 } from '../lib/web3'
 
 const artist = {
   userName: 'Van Gogh',
-  address: '0x5c611cb1afd116e0bf40aa00297688d2f8e6c9c2',
+  address: '0x13bAf63e9aDFe831b3B9c66f5bC47c9df819B393',
   galleries: [
     {
       name: 'Blue Period',
-      address: '0x36Ff249bCa4B82e99c5227337AEb87B0591E160f',
+      address: '0xBE3A3F018bB2e7CA439F69b9A5a7F5A3301879e2',
       images: ['./blue.jpeg'],
     },
   ],
