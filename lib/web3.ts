@@ -44,8 +44,9 @@ export const initWeb3 = async (
     // TODO: Should do this server side.
     detectHasPaid: async (galleryAddress: string): Promise<boolean> => {
       const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+      const blockNumber = await Medici.methods.blockNumber().call()
       const events = await Medici.getPastEvents('paymentSuccessful', {
-        fromBlock: 0,
+        fromBlock: blockNumber,
       })
 
       const receipts = events.filter((event) =>

@@ -16,6 +16,14 @@ export const mediciABI: AbiItem[] = [
   },
   {
     inputs: [],
+    name: 'blockNumber',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+    constant: true,
+  },
+  {
+    inputs: [],
     name: 'price',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',

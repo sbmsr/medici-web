@@ -8,7 +8,7 @@ const artist = {
   galleries: [
     {
       name: 'Blue Period',
-      address: '0xBE3A3F018bB2e7CA439F69b9A5a7F5A3301879e2',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
       images: ['./blue.jpeg'],
     },
   ],
