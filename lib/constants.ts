@@ -2,34 +2,25 @@ import { AbiItem } from 'web3-utils'
 
 export const mediciABI: AbiItem[] = [
   {
+    inputs: [{ internalType: 'uint256', name: 'p', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
     anonymous: false,
     inputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'address',
-        indexed: false,
-      },
+      { indexed: false, internalType: 'address', name: '', type: 'address' },
     ],
     name: 'paymentSuccessful',
     type: 'event',
-    constant: undefined,
-    payable: undefined,
   },
   {
     inputs: [],
     name: 'price',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-        internalType: 'uint256',
-      },
-    ],
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
     constant: true,
-    payable: undefined,
   },
   {
     inputs: [],
@@ -38,5 +29,12 @@ export const mediciABI: AbiItem[] = [
     stateMutability: 'payable',
     type: 'function',
     payable: true,
+  },
+  {
+    inputs: [],
+    name: 'destroy',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ]
