@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { MediciAPI } from '../lib/web3'
 
 export interface Artist {
@@ -21,7 +22,17 @@ export const GalleryTile = ({
   api: MediciAPI
 }): JSX.Element => {
   const { name, address, images } = gallery
-  const hasPaid = false
+  const [hasPaid, setHasPaid] = useState(false)
+
+  useEffect(() => {
+    const detectHasPaid = async () =>
+      setHasPaid(await api.detectHasPaid(gallery.address))
+
+    if (hasPaid === false) {
+      detectHasPaid()
+    }
+  }, [])
+
   return (
     <div>
       <h3>{name}</h3>
@@ -33,15 +44,17 @@ export const GalleryTile = ({
           max-width: 200px;
         }
       `}</style>
-      <button
-        className="button"
-        type="button"
-        onClick={async () => {
-          await api.attemptPurchase(address, gallery.price)
-        }}
-      >
-        Send Funds
-      </button>
+      {hasPaid || (
+        <button
+          className="button"
+          type="button"
+          onClick={async () => {
+            await api.attemptPurchase(address)
+          }}
+        >
+          Send Funds
+        </button>
+      )}
     </div>
   )
 }
