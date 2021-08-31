@@ -9,7 +9,7 @@ const artist = {
     {
       name: 'Blue Period',
       address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue.jpeg'],
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
     },
   ],
 }
