@@ -37,7 +37,11 @@ export const GalleryTile = ({
     <div>
       <h3>{name}</h3>
       {images.map((i: string) => (
-        <img key={i} src={hasPaid ? i : './gallery_placeholder.png'}></img>
+        <img
+          onContextMenu={(e) => e.preventDefault()}
+          key={i}
+          src={hasPaid ? i : './gallery_placeholder.png'}
+        ></img>
       ))}
       <style jsx>{`
         img {
