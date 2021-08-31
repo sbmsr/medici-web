@@ -11,6 +11,31 @@ const artist = {
       address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
       images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
     },
+    {
+      name: 'Blue Period',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+    },
+    {
+      name: 'Blue Period',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+    },
+    {
+      name: 'Blue Period',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+    },
+    {
+      name: 'Blue Period',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+    },
+    {
+      name: 'Blue Period',
+      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+    },
   ],
 }
 
@@ -26,8 +51,14 @@ export const Home = (): JSX.Element => {
   if (!api) return <h1> loading </h1>
 
   return (
-    <main>
-      <h1 className="title">Web3Modal Example</h1>
+    <main
+      style={{
+        display: 'flex',
+        flexFlow: 'row wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       {api && (
         <>
           {artist.galleries.map((gallery: Gallery) => (
