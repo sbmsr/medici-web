@@ -6,6 +6,8 @@ import { mediciABI } from './constants'
 export interface MediciAPI {
   attemptPurchase: (galleryAddress: string) => Promise<TransactionReceipt>
   detectHasPaid: (galleryAddress: string) => Promise<boolean>
+  getPriceWei: (galleryAddress: string) => Promise<string>
+  getPriceString: (galleryAddress: string) => Promise<string>
 }
 
 export const initWeb3 = async (
@@ -25,47 +27,66 @@ export const initWeb3 = async (
     return
   }
 
-  setApi({
-    attemptPurchase: async (
-      galleryAddress: string
-    ): Promise<TransactionReceipt> => {
-      const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
-      const price = await Medici.methods.price().call()
-      try {
-        return await Medici.methods.attemptPurchase().send({
-          from: fromAddresses[0], // TODO: Let user select the desired address
-          to: galleryAddress,
-          value: price,
-        })
-      } catch (e: any) {
-        alert(`Purchase Failed: ${e}`)
-      }
-    },
-    // TODO: Should do this server side.
-    detectHasPaid: async (galleryAddress: string): Promise<boolean> => {
-      const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
-      const blockNumber = await Medici.methods.blockNumber().call()
-      const events = await Medici.getPastEvents('paymentSuccessful', {
-        fromBlock: blockNumber,
+  //////////////
+  // API Methods
+  //////////////
+
+  const getPriceWei = async (galleryAddress: string): Promise<string> => {
+    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+    return await Medici.methods.price().call()
+    return
+  }
+
+  const getPriceString = async (galleryAddress: string): Promise<string> => {
+    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+    const price = await Medici.methods.price().call()
+    return web3Provider.utils.fromWei(price, 'ether')
+  }
+
+  const attemptPurchase = async (
+    galleryAddress: string
+  ): Promise<TransactionReceipt> => {
+    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+    try {
+      return await Medici.methods.attemptPurchase().send({
+        from: fromAddresses[0], // TODO: Let user select the desired address
+        to: galleryAddress,
+        value: await getPriceWei(galleryAddress),
       })
+    } catch (e: any) {
+      alert(`Purchase Failed: ${e}`)
+    }
+  }
 
-      const receipts = events.filter((event) =>
-        Object.values(event.returnValues).some((el) =>
-          fromAddresses.includes(el)
-        )
-      )
+  const detectHasPaid = async (galleryAddress: string): Promise<boolean> => {
+    // TODO: Should do this server side.
+    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+    const blockNumber = await Medici.methods.blockNumber().call()
+    const events = await Medici.getPastEvents('paymentSuccessful', {
+      fromBlock: blockNumber,
+    })
 
-      if (receipts.length === 0) return false
+    const receipts = events.filter((event) =>
+      Object.values(event.returnValues).some((el) => fromAddresses.includes(el))
+    )
 
-      receipts.sort((r1, r2) => r1.blockNumber - r2.blockNumber)
+    if (receipts.length === 0) return false
 
-      const oldestReceipt = receipts[0]
+    receipts.sort((r1, r2) => r1.blockNumber - r2.blockNumber)
 
-      const isSecure =
-        (await web3Provider.eth.getBlockNumber()) - oldestReceipt.blockNumber >=
-        12 // https://ethereum.stackexchange.com/a/3009/79524
+    const oldestReceipt = receipts[0]
 
-      return isSecure
-    },
+    const isSecure =
+      (await web3Provider.eth.getBlockNumber()) - oldestReceipt.blockNumber >=
+      12 // https://ethereum.stackexchange.com/a/3009/79524
+
+    return isSecure
+  }
+
+  setApi({
+    attemptPurchase: attemptPurchase,
+    detectHasPaid: detectHasPaid,
+    getPriceWei: getPriceWei,
+    getPriceString: getPriceString,
   })
 }

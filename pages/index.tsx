@@ -8,32 +8,7 @@ const artist = {
   galleries: [
     {
       name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
-    },
-    {
-      name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
-    },
-    {
-      name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
-    },
-    {
-      name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
-    },
-    {
-      name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
-    },
-    {
-      name: 'Blue Period',
-      address: '0xbd15647aDC66ea9cfF1C74E17a5914D0eb63d3bF',
+      address: '0x465f0Ba1BB3596Bc192Df886fbe139Df29017964',
       images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
     },
   ],
@@ -51,14 +26,8 @@ export const Home = (): JSX.Element => {
   if (!api) return <h1> loading </h1>
 
   return (
-    <main
-      style={{
-        display: 'flex',
-        flexFlow: 'row wrap',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <main className="flex flex-col items-center m-auto">
+      <h1 className="text-5xl pb-10">{`${artist.userName}'s Gallery`}</h1>
       {api && (
         <>
           {artist.galleries.map((gallery: Gallery) => (
