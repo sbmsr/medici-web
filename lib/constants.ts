@@ -1,4 +1,2 @@
-import { ContractInterface } from '@ethersproject/contracts'
-
-export const mediciABI: ContractInterface =
+export const mediciABI =
   require('../../backend/artifacts/contracts/Medici.sol/Medici.json').abi

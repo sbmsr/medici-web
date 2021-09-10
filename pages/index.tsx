@@ -4,11 +4,12 @@ import { initWeb3 } from '../lib/web3'
 
 const artist = {
   userName: 'Van Gogh',
-  address: '0x13bAf63e9aDFe831b3B9c66f5bC47c9df819B393',
+  address: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+  mediciAddress: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
   galleries: [
     {
+      id: '1',
       name: 'Blue Period',
-      address: '0x465f0Ba1BB3596Bc192Df886fbe139Df29017964',
       images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
     },
   ],
@@ -31,7 +32,12 @@ export const Home = (): JSX.Element => {
       {api && (
         <>
           {artist.galleries.map((gallery: Gallery) => (
-            <GalleryTile key={gallery.address} gallery={gallery} api={api} />
+            <GalleryTile
+              key={gallery.id}
+              address={artist.mediciAddress}
+              gallery={gallery}
+              api={api}
+            />
           ))}
         </>
       )}

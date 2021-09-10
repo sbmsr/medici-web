@@ -27,13 +27,13 @@ export const initWeb3 = async (
 
   const modalProvider = await web3Modal.connect()
   const provider = new ethers.providers.Web3Provider(modalProvider)
-  const fromAddress = await provider.getSigner().getAddress()
+  const signer = provider.getSigner()
+  const fromAddress = await signer.getAddress()
 
   const getMediciContract = async (galleryAddress): Promise<Medici> => {
-    return new ethers.Contract(
-      galleryAddress,
-      mediciABI
-    ).deployed() as Promise<Medici>
+    return new ethers.Contract(galleryAddress, mediciABI, provider).connect(
+      signer
+    ) as Medici
   }
 
   //////////////
@@ -90,7 +90,7 @@ export const initWeb3 = async (
     const fromBlock = (await Medici.blockNumber()).toNumber()
 
     const logs = await Medici.queryFilter(filter, fromBlock)
-    const iface = new ethers.utils.Interface(mediciABI.toString())
+    const iface = new ethers.utils.Interface(mediciABI)
 
     const formattedLogs: {
       block: number

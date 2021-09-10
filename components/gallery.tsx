@@ -5,12 +5,13 @@ import { MediciAPI } from '../lib/web3'
 export interface Artist {
   userName: string
   address: string
+  mediciAddress: string
   galleries: Gallery[]
 }
 
 export interface Gallery {
+  id: string
   name: string
-  address: string
   images: string[]
 }
 
@@ -25,19 +26,20 @@ const settings = {
 export const GalleryTile = ({
   gallery,
   api,
+  address,
 }: {
   gallery: Gallery
   api: MediciAPI
+  address: string
 }): JSX.Element => {
-  const { name, address, images } = gallery
+  const { name, images, id } = gallery
   const [hasPaid, setHasPaid] = useState(false)
   const [price, setPrice] = useState('')
 
   useEffect(() => {
     const detectHasPaid = async () =>
-      setHasPaid(await api.detectHasPaid(gallery.address))
-    const getPrice = async () =>
-      setPrice(await api.getPriceString(gallery.address))
+      setHasPaid(await api.detectHasPaid(address, id))
+    const getPrice = async () => setPrice(await api.getPriceString(address, id))
 
     if (hasPaid === false) {
       detectHasPaid()
@@ -71,7 +73,7 @@ export const GalleryTile = ({
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto"
             type="button"
             onClick={async () => {
-              await api.attemptPurchase(address)
+              await api.attemptPurchase(address, [id])
             }}
           >
             {`Purchase for Ξ ${price}`}
