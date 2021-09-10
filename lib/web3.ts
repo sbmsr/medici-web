@@ -1,13 +1,19 @@
-import Web3 from 'web3'
-import { TransactionReceipt } from 'web3-eth'
+import { ContractTransaction, ethers } from 'ethers'
 import Web3Modal from 'web3modal'
+import { Medici } from '../../backend/typechain/Medici'
 import { mediciABI } from './constants'
 
 export interface MediciAPI {
-  attemptPurchase: (galleryAddress: string) => Promise<TransactionReceipt>
-  detectHasPaid: (galleryAddress: string) => Promise<boolean>
-  getPriceWei: (galleryAddress: string) => Promise<string>
-  getPriceString: (galleryAddress: string) => Promise<string>
+  getPriceWei: (
+    galleryAddress: string,
+    productId: string
+  ) => Promise<ethers.BigNumber>
+  getPriceString: (galleryAddress: string, productId: string) => Promise<string>
+  attemptPurchase: (
+    galleryAddress: string,
+    productIds: string[]
+  ) => Promise<ContractTransaction>
+  detectHasPaid: (galleryAddress: string, productId: string) => Promise<boolean>
 }
 
 export const initWeb3 = async (
@@ -20,65 +26,98 @@ export const initWeb3 = async (
   })
 
   const modalProvider = await web3Modal.connect()
-  const web3Provider = new Web3(modalProvider)
-  const fromAddresses = await web3Provider.eth.getAccounts()
-  if (fromAddresses === []) {
-    alert(`Unable to retrieve your address`)
-    return
+  const provider = new ethers.providers.Web3Provider(modalProvider)
+  const fromAddress = await provider.getSigner().getAddress()
+
+  const getMediciContract = async (galleryAddress): Promise<Medici> => {
+    return new ethers.Contract(
+      galleryAddress,
+      mediciABI
+    ).deployed() as Promise<Medici>
   }
 
   //////////////
   // API Methods
   //////////////
 
-  const getPriceWei = async (galleryAddress: string): Promise<string> => {
-    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
-    return await Medici.methods.price().call()
-    return
+  const getPriceWei = async (
+    galleryAddress: string,
+    productId: string
+  ): Promise<ethers.BigNumber> => {
+    const Medici = await getMediciContract(galleryAddress)
+    return (await Medici.inventory(productId)).price
   }
 
-  const getPriceString = async (galleryAddress: string): Promise<string> => {
-    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
-    const price = await Medici.methods.price().call()
-    return web3Provider.utils.fromWei(price, 'ether')
+  const getPriceString = async (
+    galleryAddress: string,
+    productId: string
+  ): Promise<string> => {
+    const Medici = await getMediciContract(galleryAddress)
+    const price = (await Medici.inventory(productId)).price
+    return ethers.utils.formatEther(price)
   }
 
   const attemptPurchase = async (
-    galleryAddress: string
-  ): Promise<TransactionReceipt> => {
-    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
+    galleryAddress: string,
+    productIds: string[]
+  ): Promise<ContractTransaction> => {
+    const Medici = await getMediciContract(galleryAddress)
+    const prices = await Promise.all(
+      productIds.map(
+        async (productId) => await getPriceWei(galleryAddress, productId)
+      )
+    )
+
+    const sum = prices.reduce((x, y) => (y ? x.add(y) : x))
+
     try {
-      return await Medici.methods.attemptPurchase().send({
-        from: fromAddresses[0], // TODO: Let user select the desired address
-        to: galleryAddress,
-        value: await getPriceWei(galleryAddress),
+      return await Medici.attemptPurchase(productIds, {
+        from: fromAddress,
+        value: sum,
       })
     } catch (e: any) {
       alert(`Purchase Failed: ${e}`)
     }
   }
 
-  const detectHasPaid = async (galleryAddress: string): Promise<boolean> => {
+  const detectHasPaid = async (
+    galleryAddress: string,
+    productId: string
+  ): Promise<boolean> => {
     // TODO: Should do this server side.
-    const Medici = new web3Provider.eth.Contract(mediciABI, galleryAddress)
-    const blockNumber = await Medici.methods.blockNumber().call()
-    const events = await Medici.getPastEvents('paymentSuccessful', {
-      fromBlock: blockNumber,
+    const Medici = await getMediciContract(galleryAddress)
+    const filter = Medici.filters.paymentSuccessful(fromAddress)
+    const fromBlock = (await Medici.blockNumber()).toNumber()
+
+    const logs = await Medici.queryFilter(filter, fromBlock)
+    const iface = new ethers.utils.Interface(mediciABI.toString())
+
+    const formattedLogs: {
+      block: number
+      event: string
+      buyer: string
+      products: string[]
+    }[] = logs.map((log) => {
+      const { args, name } = iface.parseLog(log)
+      return {
+        block: log.blockNumber,
+        event: name,
+        buyer: args.buyer,
+        products: args.products,
+      }
     })
 
-    const receipts = events.filter((event) =>
-      Object.values(event.returnValues).some((el) => fromAddresses.includes(el))
-    )
+    const logsWithProductId = formattedLogs
+      .filter((log) => log.products.includes(productId))
+      .sort((l1, l2) => l1.block - l2.block)
 
-    if (receipts.length === 0) return false
+    if (logsWithProductId.length == 0) return false
 
-    receipts.sort((r1, r2) => r1.blockNumber - r2.blockNumber)
+    const oldestPurchase = logsWithProductId[0]
 
-    const oldestReceipt = receipts[0]
-
+    // https://ethereum.stackexchange.com/a/3009/79524
     const isSecure =
-      (await web3Provider.eth.getBlockNumber()) - oldestReceipt.blockNumber >=
-      12 // https://ethereum.stackexchange.com/a/3009/79524
+      (await provider.getBlockNumber()) - oldestPurchase.block >= 12
 
     return isSecure
   }
