@@ -9,8 +9,13 @@ const artist = {
   galleries: [
     {
       id: '1',
-      name: 'Blue Period',
-      images: ['./blue1.jpeg', './blue2.jpeg', './blue3.jpeg'],
+      name: 'Blue Period1',
+      images: ['./blue1.jpeg', './blue2.jpeg'],
+    },
+    {
+      id: '2',
+      name: 'Blue Period 2',
+      images: ['./blue3.jpeg'],
     },
   ],
 }
