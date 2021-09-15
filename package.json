@@ -25,9 +25,12 @@
   "dependencies": {
     "next": "latest",
     "next-auth": "4.0.0-beta.2",
+    "pg": "^8.7.1",
+    "pg-hstore": "^2.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-slick": "^0.28.1",
+    "sequelize": "^6.6.5",
     "slick-carousel": "^1.8.1",
     "web3": "^1.5.2",
     "web3modal": "^1.9.4"
@@ -35,8 +38,9 @@
   "devDependencies": {
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^26.0.23",
-    "@types/node": "^14.14.25",
+    "@types/node": "^16.9.1",
     "@types/react": "^17.0.1",
+    "@types/validator": "^13.6.3",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "autoprefixer": "^10.3.3",
