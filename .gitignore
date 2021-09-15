@@ -32,3 +32,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+/.blackbox/pubring.gpg~
+/.blackbox/pubring.kbx~
+/.blackbox/secring.gpg
