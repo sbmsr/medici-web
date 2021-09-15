@@ -36,3 +36,6 @@ yarn-error.log*
 /.blackbox/pubring.kbx~
 /.blackbox/secring.gpg
 /.env.local
+
+# sqlite
+*.db
