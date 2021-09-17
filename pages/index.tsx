@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { Gallery, GalleryTile } from '../components/gallery'
 import { initWeb3 } from '../lib/web3'
@@ -32,21 +33,26 @@ export const Home = (): JSX.Element => {
   if (!api) return <h1> loading </h1>
 
   return (
-    <main className="flex flex-col items-center m-auto">
-      <h1 className="text-5xl pb-10">{`${artist.userName}'s Gallery`}</h1>
-      {api && (
-        <>
-          {artist.galleries.map((gallery: Gallery) => (
-            <GalleryTile
-              key={gallery.id}
-              address={artist.mediciAddress}
-              gallery={gallery}
-              api={api}
-            />
-          ))}
-        </>
-      )}
-    </main>
+    <>
+      <nav className="w-full flex flex-row justify-end">
+        <Link href="/admin">admin_login</Link>
+      </nav>
+      <main className="flex flex-col items-center m-auto">
+        <h1 className="text-5xl pb-10">{`${artist.userName}'s Gallery`}</h1>
+        {api && (
+          <>
+            {artist.galleries.map((gallery: Gallery) => (
+              <GalleryTile
+                key={gallery.id}
+                address={artist.mediciAddress}
+                gallery={gallery}
+                api={api}
+              />
+            ))}
+          </>
+        )}
+      </main>
+    </>
   )
 }
 
