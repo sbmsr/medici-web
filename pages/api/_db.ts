@@ -12,43 +12,19 @@ export interface User {
 }
 
 db.define(
-  'users',
-  {
-    address: {
-      allowNull: false,
-      type: DataTypes.STRING,
-      unique: true,
-      validate: { isEthereumAddress: ethers.utils.isAddress },
-      primaryKey: true,
-    },
-    nonce: {
-      allowNull: false,
-      type: DataTypes.BIGINT,
-      defaultValue: () => Math.floor(Math.random() * 1000000), // Initialize with a random nonce
-    },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-  },
-  {
-    timestamps: false,
-  }
-)
-
-db.define(
-  'roles',
+  'stores',
   {
     id: {
       allowNull: false,
       type: DataTypes.INTEGER,
-      autoIncrement: true,
+      autoIncrementIdentity: true,
       primaryKey: true,
+      unique: true,
     },
-    name: {
-      allowNull: false,
+    contractAddress: {
       type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
       unique: true,
     },
   },
@@ -58,21 +34,25 @@ db.define(
 )
 
 db.define(
-  'user_roles',
+  'users',
   {
-    address: {
-      type: DataTypes.STRING,
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrementIdentity: true,
+      unique: true,
       primaryKey: true,
-      references: {
-        model: 'users',
-        key: 'address',
-      },
     },
-    role: {
+    email: {
       type: DataTypes.STRING,
+      validate: { isEthereumAddress: ethers.utils.isAddress },
       primaryKey: true,
+      unique: true,
+    },
+    store: {
+      type: DataTypes.INTEGER,
+      validate: { isEthereumAddress: ethers.utils.isAddress },
       references: {
-        model: 'roles',
+        model: 'stores',
         key: 'id',
       },
     },
@@ -83,26 +63,21 @@ db.define(
 )
 
 db.define(
-  'stores',
+  'galleries',
   {
     id: {
-      allowNull: false,
       type: DataTypes.INTEGER,
-      autoIncrement: true,
+      autoIncrementIdentity: true,
+      unique: true,
       primaryKey: true,
     },
-    contractAddress: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    owner: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    store: {
+      type: DataTypes.INTEGER,
       references: {
-        model: 'users',
-        key: 'address',
+        model: 'stores',
+        key: 'id',
       },
+      primaryKey: true,
     },
   },
   {
@@ -124,31 +99,8 @@ db.define(
     },
     url: {
       allowNull: false,
+      unique: true,
       type: DataTypes.STRING,
-    },
-  },
-  {
-    timestamps: false,
-  }
-)
-
-db.define(
-  'galleries',
-  {
-    store: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'stores',
-        key: 'id',
-      },
-      primaryKey: true,
-    },
-    id: {
-      allowNull: false,
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
     },
   },
   {

@@ -11,6 +11,10 @@ export const Admin = (): JSX.Element => {
     if (!api) {
       initWeb3(setApi)
     }
+
+    if (session) {
+      // TODO: Fetch Data here.
+    }
   }, [])
 
   if (!api) return <h1> loading </h1>
@@ -19,7 +23,8 @@ export const Admin = (): JSX.Element => {
     <main className="flex flex-col items-center m-auto">
       {session ? (
         <>
-          Signed in as {session.user.name} <br />
+          Signed in as {session.user.name}{' '}
+          {session.user.email && `With email: ${session.user.email}`} <br />
           <button onClick={() => signOut()}>Sign out</button>{' '}
         </>
       ) : (
