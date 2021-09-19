@@ -37,6 +37,7 @@ export const Admin = (): JSX.Element => {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function getServerSideProps(ctx: any): Promise<any> {
   return {
     props: {
