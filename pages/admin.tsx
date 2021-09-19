@@ -5,6 +5,11 @@ import { initWeb3 } from '../lib/web3'
 export const Admin = (): JSX.Element => {
   const { data: session } = useSession()
 
+  if (!session) {
+    signIn()
+    return <>Loading</>
+  }
+
   const [api, setApi] = useState(undefined)
 
   useEffect(() => {
@@ -23,9 +28,10 @@ export const Admin = (): JSX.Element => {
     <main className="flex flex-col items-center m-auto">
       {session ? (
         <>
-          Signed in as {session.user.name}{' '}
-          {session.user.email && `With email: ${session.user.email}`} <br />
-          <button onClick={() => signOut()}>Sign out</button>{' '}
+          {JSON.stringify(session.user, null, 2)}
+          <button onClick={() => signOut({ redirect: true, callbackUrl: '/' })}>
+            Sign out
+          </button>
         </>
       ) : (
         <>
