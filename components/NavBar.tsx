@@ -1,14 +1,15 @@
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
+import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { PlusSmIcon } from '@heroicons/react/solid'
 import { Session } from 'next-auth'
-import { Fragment } from 'react'
+import Link from 'next/link'
+import React, { Fragment } from 'react'
 
 const navigation = [
   {
     name: 'Cash Out',
-    href: '#',
-    current: true,
+    href: '/cashOut',
+    current: false,
     onClick: () => {
       alert(`cash out`)
     },
@@ -18,7 +19,7 @@ const navigation = [
 const userNavigation = [
   {
     name: 'Sign out',
-    href: '#',
+    href: '',
     onClick: () => {
       alert(`signing out`)
     },
@@ -27,9 +28,9 @@ const userNavigation = [
 
 const ctaButton = {
   name: 'New Post',
-  href: '#',
+  href: '/createPost',
   onClick: () => {
-    alert(`new post`)
+    return
   },
 }
 
@@ -74,37 +75,41 @@ export default function NavBar({
                 </div>
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
-                      onClick={() => item.onClick && item.onClick()}
-                      className={classNames(
-                        item.current
-                          ? 'bg-gray-900 text-white'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'px-3 py-2 rounded-md text-sm font-medium'
-                      )}
                       aria-current={item.current ? 'page' : undefined}
                     >
-                      {item.name}
-                    </a>
+                      <a
+                        className={classNames(
+                          item.current
+                            ? 'bg-gray-900 text-white'
+                            : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          'px-3 py-2 rounded-md text-sm font-medium'
+                        )}
+                      >
+                        {item.name}
+                      </a>
+                    </Link>
                   ))}
                 </div>
               </div>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <button
-                    key={ctaButton.name}
-                    type="button"
-                    className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
-                    onClick={() => ctaButton?.onClick()}
-                  >
-                    <PlusSmIcon
-                      className="-ml-1 mr-2 h-5 w-5"
-                      aria-hidden="true"
-                    />
-                    <span>{ctaButton.name}</span>
-                  </button>
+                  <Link href={ctaButton.href}>
+                    <button
+                      key={ctaButton.name}
+                      type="button"
+                      className="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                      onClick={() => ctaButton?.onClick()}
+                    >
+                      <PlusSmIcon
+                        className="-ml-1 mr-2 h-5 w-5"
+                        aria-hidden="true"
+                      />
+                      <span>{ctaButton.name}</span>
+                    </button>
+                  </Link>
                 </div>
                 <div className="hidden md:ml-4 md:flex-shrink-0 md:flex md:items-center">
                   {/* Profile dropdown */}
@@ -191,10 +196,7 @@ export default function NavBar({
                 <button
                   type="button"
                   className="ml-auto flex-shrink-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                ></button>
               </div>
               <div className="mt-3 px-2 space-y-1 sm:px-3">
                 {userNavigation.map((item) => (
