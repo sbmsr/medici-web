@@ -2,6 +2,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { PlusSmIcon } from '@heroicons/react/solid'
 import { Session } from 'next-auth'
+import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
@@ -20,9 +21,7 @@ const userNavigation = [
   {
     name: 'Sign out',
     href: '',
-    onClick: () => {
-      alert(`signing out`)
-    },
+    onClick: () => signOut({ callbackUrl: '/' }),
   },
 ]
 
