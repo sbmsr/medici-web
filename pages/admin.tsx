@@ -1,45 +1,27 @@
-import { getSession, signIn, signOut, useSession } from 'next-auth/react'
-import React, { useEffect, useState } from 'react'
-import { initWeb3 } from '../lib/web3'
+import { getSession, signIn, useSession } from 'next-auth/react'
+import React, { useEffect } from 'react'
+import NavBar from '../components/NavBar'
 
 export const Admin = (): JSX.Element => {
   const { data: session } = useSession()
 
-  if (!session) {
-    signIn()
-    return <>Loading</>
-  }
-
-  const [api, setApi] = useState(undefined)
-
   useEffect(() => {
-    if (!api) {
-      initWeb3(setApi)
-    }
-
     if (session) {
       // TODO: Fetch Data here.
     }
   }, [])
 
-  if (!api) return <h1> loading </h1>
+  if (!session) {
+    signIn()
+  }
+
+  if (!session) return <h1> loading </h1>
 
   return (
-    <main className="flex flex-col items-center m-auto">
-      {session ? (
-        <>
-          {JSON.stringify(session.user, null, 2)}
-          <button onClick={() => signOut({ redirect: true, callbackUrl: '/' })}>
-            Sign out
-          </button>
-        </>
-      ) : (
-        <>
-          Not signed in <br />
-          <button onClick={() => signIn()}>Sign in</button>
-        </>
-      )}
-    </main>
+    <>
+      <NavBar user={session.user} />
+      <main className="flex flex-col items-center m-auto"></main>
+    </>
   )
 }
 
