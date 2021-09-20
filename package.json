@@ -25,6 +25,7 @@
   "dependencies": {
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.4",
+    "@tailwindcss/forms": "^0.3.3",
     "next": "latest",
     "next-auth": "4.0.0-beta.2",
     "pg": "^8.7.1",
