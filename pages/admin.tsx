@@ -18,7 +18,6 @@ export const Admin = (): JSX.Element => {
   }, [])
 
   if (status !== 'authenticated') return <h1> loading </h1>
-
   return (
     <>
       <NavBar user={session.user} hideCTA={false} />

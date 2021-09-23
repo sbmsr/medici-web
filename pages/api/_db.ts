@@ -1,37 +1,8 @@
-import { ethers } from 'ethers'
 import { DataTypes, Sequelize } from 'sequelize'
 
 export const db = new Sequelize(process.env.DATABASE_CONNECTION_URL, {
   logging: false,
 })
-
-export interface User {
-  publicAddress: string
-  nonce: number
-  username: string
-}
-
-db.define(
-  'stores',
-  {
-    id: {
-      allowNull: false,
-      type: DataTypes.INTEGER,
-      autoIncrementIdentity: true,
-      primaryKey: true,
-      unique: true,
-    },
-    contractAddress: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      primaryKey: true,
-      unique: true,
-    },
-  },
-  {
-    timestamps: false,
-  }
-)
 
 db.define(
   'users',
@@ -39,22 +10,14 @@ db.define(
     id: {
       type: DataTypes.INTEGER,
       autoIncrementIdentity: true,
+      autoIncrement: true,
       unique: true,
       primaryKey: true,
     },
     email: {
       type: DataTypes.STRING,
-      validate: { isEthereumAddress: ethers.utils.isAddress },
       primaryKey: true,
       unique: true,
-    },
-    store: {
-      type: DataTypes.INTEGER,
-      validate: { isEthereumAddress: ethers.utils.isAddress },
-      references: {
-        model: 'stores',
-        key: 'id',
-      },
     },
   },
   {
@@ -63,21 +26,25 @@ db.define(
 )
 
 db.define(
-  'galleries',
+  'posts',
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrementIdentity: true,
+      autoIncrement: true,
       unique: true,
       primaryKey: true,
     },
-    store: {
+    user: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'stores',
+        model: 'users',
         key: 'id',
       },
       primaryKey: true,
+    },
+    amount: {
+      type: DataTypes.INTEGER,
     },
   },
   {
@@ -86,13 +53,13 @@ db.define(
 )
 
 db.define(
-  'images',
+  'content',
   {
-    gallery: {
+    post: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'galleries',
+        model: 'posts',
         key: 'id',
       },
       primaryKey: true,
@@ -107,5 +74,8 @@ db.define(
     timestamps: false,
   }
 )
-
-db.sync()
+try {
+  await db.sync()
+} catch (e) {
+  console.error(e)
+}

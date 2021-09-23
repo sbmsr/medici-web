@@ -1,7 +1,40 @@
+import Form from '@rjsf/core'
+import { JSONSchema7 } from 'json-schema'
 import { signIn, useSession } from 'next-auth/react'
-import { useEffect } from 'react'
-import InputField from '../components/InputField'
+import React, { useEffect } from 'react'
 import NavBar from '../components/NavBar'
+
+export const formSchema: JSONSchema7 = {
+  title: 'Create Post',
+  type: 'object',
+  required: ['files'],
+  properties: {
+    amount: {
+      type: 'string',
+      pattern: '^(0|([1-9]+[0-9]*))(.[0-9]{1,2})?$',
+      minLength: 1,
+      default: '$10.00',
+    },
+    files: {
+      type: 'array',
+      title: 'Multiple files',
+      items: { type: 'string', format: 'data-url' },
+    },
+  },
+}
+
+const uiSchema = {
+  files: {
+    'ui:options': {
+      accept: ['.mp4', '.jpg', '.jpeg', '.png'],
+    },
+  },
+}
+
+const formData = {
+  amount: '10.00',
+  files: [],
+}
 
 export default function CreatePost(): JSX.Element {
   const { data: session, status } = useSession({
@@ -23,17 +56,17 @@ export default function CreatePost(): JSX.Element {
     <>
       <NavBar user={session.user} hideCTA={true} />
       <main className="flex flex-col mx-0 px-0 max-w-7xl md:mx-auto md:px-4 lg:px-8">
-        <div className="flex flex-row justify-between px-5 py-10 md:px-0 text-2xl">
-          <span>Create Post</span>
-        </div>
-        <InputField name="Post Name" optional={false} placeholder="" />
-        <InputField name="Price" optional={true} placeholder="$10.00" />
-        <button
-          type="button"
-          className="m-auto w-1/3 px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Submit
-        </button>
+        <Form
+          schema={formSchema}
+          uiSchema={uiSchema}
+          formData={formData}
+          onSubmit={() =>
+            fetch('/api/createPost', {
+              method: 'POST',
+              body: JSON.stringify(formData),
+            }).then((res) => res.json())
+          }
+        />
       </main>
     </>
   )
