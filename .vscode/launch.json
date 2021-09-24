@@ -15,8 +15,8 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Next App (Dev)",
-      "args": ["dev"],
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["run", "dev"],
       "port": 9229
     }
   ]
