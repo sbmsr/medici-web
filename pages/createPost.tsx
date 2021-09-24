@@ -37,13 +37,45 @@ const formData = {
   files: [],
 }
 
+const getMetaForDataURIString = (dataURIString) => {
+  return {
+    fileName: dataURIString.split('data:')[1].split(';')[1].split('=')[1],
+    mimeType: dataURIString.split('data:')[1].split(';')[0],
+  }
+}
+
 const handleOnSubmit = async ({ formData }) => {
   console.error(`received ${JSON.stringify(formData)}`)
+  const meta = formData.files.map(getMetaForDataURIString)
+
   const res = await fetch('/api/createPost', {
     method: 'POST',
-    body: JSON.stringify(formData), //TODO: rather than pass the actual file data, just pass the file couht here. this endpoint will return a signed url for each file.
+    body: JSON.stringify({
+      amount: formData.amount,
+      meta: meta,
+    }),
   })
-  console.error(JSON.stringify(res))
+
+  if (res.status !== 201) {
+    console.error(await res.json())
+    return
+  }
+
+  const presignedUrls = await res.json()
+
+  const uploadToS3 = () =>
+    presignedUrls.map(async (url, idx) => {
+      await fetch(url, {
+        method: 'PUT',
+        body: formData.files[idx],
+      })
+    })
+
+  try {
+    await Promise.all(await uploadToS3())
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 export default function CreatePost(): JSX.Element {
