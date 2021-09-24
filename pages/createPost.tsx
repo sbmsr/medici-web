@@ -19,6 +19,7 @@ export const formSchema: JSONSchema7 = {
       type: 'array',
       title: 'Multiple files',
       items: { type: 'string', format: 'data-url' },
+      minItems: 1,
     },
   },
 }
@@ -26,7 +27,7 @@ export const formSchema: JSONSchema7 = {
 const uiSchema = {
   files: {
     'ui:options': {
-      accept: ['.mp4', '.jpg', '.jpeg', '.png'],
+      accept: ['.mp4', '.jpg', '.jpeg', '.png', '.mov'],
     },
   },
 }
@@ -34,6 +35,15 @@ const uiSchema = {
 const formData = {
   amount: '10.00',
   files: [],
+}
+
+const handleOnSubmit = async ({ formData }) => {
+  console.error(`received ${JSON.stringify(formData)}`)
+  const res = await fetch('/api/createPost', {
+    method: 'POST',
+    body: JSON.stringify(formData), //TODO: rather than pass the actual file data, just pass the file couht here. this endpoint will return a signed url for each file.
+  })
+  console.error(JSON.stringify(res))
 }
 
 export default function CreatePost(): JSX.Element {
@@ -60,12 +70,7 @@ export default function CreatePost(): JSX.Element {
           schema={formSchema}
           uiSchema={uiSchema}
           formData={formData}
-          onSubmit={() =>
-            fetch('/api/createPost', {
-              method: 'POST',
-              body: JSON.stringify(formData),
-            }).then((res) => res.json())
-          }
+          onSubmit={(x) => handleOnSubmit(x)}
         />
       </main>
     </>
