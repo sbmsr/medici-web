@@ -1,7 +1,7 @@
 import Form from '@rjsf/core'
 import { JSONSchema7 } from 'json-schema'
 import { signIn, useSession } from 'next-auth/react'
-import React from 'react'
+import React, { useState } from 'react'
 import NavBar from '../components/NavBar'
 
 export const formSchema: JSONSchema7 = {
@@ -44,14 +44,13 @@ const getMetaForDataURIString = (dataURIString) => {
   }
 }
 
-const handleOnSubmit = async ({ formData }) => {
-  console.error(`received ${JSON.stringify(formData)}`)
-  const meta = formData.files.map(getMetaForDataURIString)
+const submitCreatePost = async ({ files, amount }) => {
+  const meta = files.map(getMetaForDataURIString)
 
   const res = await fetch('/api/createPost', {
     method: 'POST',
     body: JSON.stringify({
-      amount: formData.amount,
+      amount: amount,
       meta: meta,
     }),
   })
@@ -62,23 +61,22 @@ const handleOnSubmit = async ({ formData }) => {
   }
 
   const presignedUrls = await res.json()
+  return presignedUrls
+}
 
-  const uploadToS3 = () =>
+const attemptUploadToS3 = async (files: string[], presignedUrls: string[]) => {
+  await Promise.all(
     presignedUrls.map(async (url, idx) => {
       await fetch(url, {
         method: 'PUT',
-        body: formData.files[idx],
+        body: files[idx],
       })
     })
-
-  try {
-    await Promise.all(await uploadToS3())
-  } catch (e) {
-    console.error(e)
-  }
+  )
 }
 
 export default function CreatePost(): JSX.Element {
+  const [step, setStep] = useState(0)
   const { data: session, status } = useSession({
     required: true,
     onUnauthenticated: () => {
@@ -88,16 +86,52 @@ export default function CreatePost(): JSX.Element {
 
   if (status !== 'authenticated') return <h1> loading </h1>
 
+  const handleOnSubmit = async ({ formData }) => {
+    const presignedUrls = await submitCreatePost(formData)
+    setStep(1)
+    try {
+      await attemptUploadToS3(formData.files, presignedUrls)
+      setStep(2)
+    } catch (e) {
+      setStep(-1)
+      return
+    }
+  }
+
   return (
     <>
       <NavBar user={session.user} hideCTA={true} />
       <main className="flex flex-col mx-0 px-0 max-w-7xl md:mx-auto md:px-4 lg:px-8">
-        <Form
-          schema={formSchema}
-          uiSchema={uiSchema}
-          formData={formData}
-          onSubmit={(x) => handleOnSubmit(x)}
-        />
+        {step == -1 && (
+          <>
+            <span> There was an error, please try again! </span>{' '}
+            <Form
+              schema={formSchema}
+              uiSchema={uiSchema}
+              formData={formData}
+              onSubmit={handleOnSubmit}
+            />
+          </>
+        )}
+
+        {step == 0 && (
+          <Form
+            schema={formSchema}
+            uiSchema={uiSchema}
+            formData={formData}
+            onSubmit={async (event) => await handleOnSubmit(event)}
+          />
+        )}
+        {step == 1 && (
+          <>
+            <svg
+              className="animate-spin h-5 w-5 mr-3"
+              viewBox="0 0 24 24"
+            ></svg>
+            <span>Uploading Content . . .</span>
+          </>
+        )}
+        {step == 2 && <span> Done! </span>}
       </main>
     </>
   )

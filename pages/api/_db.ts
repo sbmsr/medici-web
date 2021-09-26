@@ -62,15 +62,19 @@ db.define(
         model: 'posts',
         key: 'id',
       },
-      primaryKey: true,
     },
     url: {
-      allowNull: false,
-      unique: true,
       type: DataTypes.STRING,
+      primaryKey: true,
     },
   },
   {
+    indexes: [
+      {
+        unique: false,
+        fields: ['url'],
+      },
+    ],
     timestamps: false,
   }
 )
