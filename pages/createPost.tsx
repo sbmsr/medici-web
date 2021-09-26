@@ -1,7 +1,7 @@
 import Form from '@rjsf/core'
 import { JSONSchema7 } from 'json-schema'
 import { signIn, useSession } from 'next-auth/react'
-import React, { useEffect } from 'react'
+import React from 'react'
 import NavBar from '../components/NavBar'
 
 export const formSchema: JSONSchema7 = {
@@ -85,12 +85,6 @@ export default function CreatePost(): JSX.Element {
       signIn()
     },
   })
-
-  useEffect(() => {
-    if (session) {
-      // TODO: Fetch Data here.
-    }
-  }, [])
 
   if (status !== 'authenticated') return <h1> loading </h1>
 
